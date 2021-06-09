@@ -31,7 +31,6 @@ void init_db() {
 
     fwrite(&parent, sizeof(parent), 1, fptr);
     fclose(fptr);
-    fclose(fptr);
 
 }
 

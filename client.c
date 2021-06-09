@@ -9,7 +9,7 @@
 #include "cmd_parser.h"
 
 #define HOST "127.0.0.1"
-#define PORT 4444
+#define PORT 4445
 
 #define BUFFER_SIZE 1024
 

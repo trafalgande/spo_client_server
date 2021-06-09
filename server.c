@@ -6,11 +6,12 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "cmd_parser.h"
 #include <json-c/json.h>
+#include "api.h"
+#include "cmd_parser.h"
 
 #define HOST "127.0.0.1"
-#define PORT 4444
+#define PORT 4445
 
 #define BUFFER_SIZE 1024
 #define RESPONSE_SIZE 1024
@@ -32,6 +33,10 @@ struct Api {
 typedef struct Api Api;
 
 int main() {
+
+    init_db();
+    const char * res = api_read("1","2","3","4");
+    printf("%s",res);
 
     int sockfd, ret;
     struct sockaddr_in serverAddr;
