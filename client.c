@@ -3,9 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#include "cmd_parser.h"
 
 #define HOST "127.0.0.1"
 #define PORT 4444
@@ -41,9 +42,15 @@ int main() {
         printf("$ \t");
         if (fgets(buffer, sizeof(buffer), stdin)) {
             buffer[strcspn(buffer, "\n")] = 0; // remove newline symbol
-            send(clientSocket, buffer, strlen(buffer), 0);
+            const char *cmd = parse_cmd_to_json(buffer);
+            if (cmd != NULL) {
+                send(clientSocket, cmd, strlen(cmd), 0);
+            } else {
+                printf("[!] Invalid arguments.\n");
+                printf("$ \t");
+            }
         }
-
+        bzero(buffer, BUFFER_SIZE);
 
         if (strcmp(buffer, ":exit") == 0) {
             close(clientSocket);
