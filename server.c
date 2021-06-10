@@ -14,7 +14,6 @@
 #define PORT 4445
 
 #define BUFFER_SIZE 1024
-#define RESPONSE_SIZE 1024
 
 typedef enum {
     CREATE,
@@ -25,9 +24,9 @@ typedef enum {
 
 struct Api {
     COMMAND_TYPE command;
-    const char* params;
-    const char* path;
-    const char* condition;
+    char* params;
+    char* path;
+    char* condition;
 };
 
 typedef struct Api Api;
@@ -35,7 +34,7 @@ typedef struct Api Api;
 int main() {
 
     init_db();
-    const char *res = api_read("1","2","3","4");
+    const char *res = api_read(".","2","3","4");
     printf("%s\n", res);
 
     int sockfd, ret;
@@ -47,7 +46,7 @@ int main() {
     socklen_t addr_size;
 
     char buffer[BUFFER_SIZE];
-    char response[RESPONSE_SIZE];
+    const char* response;
 
     pid_t childpid;
 
@@ -104,9 +103,9 @@ int main() {
                 json_object *jobj = parse_str_to_json_obj(buffer);
                 if (jobj) {
                     COMMAND_TYPE command;
-                    const char* params;
-                    const char* path;
-                    const char* condition;
+                    char* params;
+                    char* path;
+                    char* condition;
                     json_object_object_foreach(jobj, key, val) {
                         if (strcmp(key, "cmd") == 0) {
                             if (strcmp(json_object_get_string(val), "create") == 0)
@@ -126,31 +125,39 @@ int main() {
                             condition = json_object_get_string(val);
                     }
                     struct Api api_struct = {command, params, path, condition};
-
                     switch (command) {
                         case CREATE: {
-                            //api_create call
+                           response = api_create(api_struct.path, api_struct.params, "", api_struct.condition);
+                            send(newSocket, response, strlen(response), 0);
+                            bzero(&response, strlen(response));
                             break;
                         }
                         case READ: {
-                            //api_read call
+                            response = api_read(api_struct.path, api_struct.params, api_struct.condition, "");
+                            send(newSocket, response, strlen(response), 0);
+                            bzero(&response, strlen(response));
                             break;
                         }
                         case UPDATE: {
-                            //api_update call
+                            response = api_update(api_struct.path, api_struct.params, api_struct.condition, "");
+                            send(newSocket, response, strlen(response), 0);
+                            bzero(&response, strlen(response));
                             break;
                         }
                         case DELETE: {
-                            //api_delete call
+                            response = api_delete(api_struct.path, api_struct.params, "", "");
+                            send(newSocket, response, strlen(response), 0);
+                            bzero(&response, strlen(response));
                             break;
                         }
                         default: {
-                            //ignore
+                            response = "{\"error\": \"unexpected_command\"}";
+                            send(newSocket, response, strlen(response), 0);
+                            bzero(&response, strlen(response));
                             break;
                         }
                     }
                 }
-                send(newSocket, buffer, strlen(buffer), 0);
             }
         }
     }
