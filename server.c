@@ -35,8 +35,8 @@ typedef struct Api Api;
 int main() {
 
     init_db();
-    const char * res = api_read("1","2","3","4");
-    printf("%s",res);
+    const char *res = api_read("1","2","3","4");
+    printf("%s\n", res);
 
     int sockfd, ret;
     struct sockaddr_in serverAddr;
