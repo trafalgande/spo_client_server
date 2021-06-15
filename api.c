@@ -170,29 +170,22 @@ char *api_read(char *path, char *param, char *value, char *key, char *cond) {
     if (strcmp(cond,"")==0) return api_read_no_cond(path, param, value, key, cond);
 
     bson_t b = read_bson();
-    ////printf("%s\n", bson_as_canonical_extended_json(&b, NULL));
 
     int full_path_len = strlen(path) + 1 + strlen(key);
     char full_path[full_path_len];
     bzero(full_path, full_path_len);
     strcat(full_path, path);
 
-    ////printf("new_path=%s\n", path);
-    ////printf("key=%s\n", key);
-    ////printf("full_path=%s\n", full_path);
-
-    //conatraints
     bson_iter_t iter;
     bson_iter_init(&iter, &b);
     bson_iter_t baz;
-    if (!(strcmp(path, "") == 0))
+    if (strcmp(path, "") != 0)
         if (!((bson_iter_init(&iter, &b) && bson_iter_find_descendant(&iter, full_path, &baz))))
             return "{\"error\": \"does not exists\"}";
-    //conatraints
 
     bson_iter_init(&iter, &b);
     bson_iter_t new_iter;
-    if (!((strcmp(path,"")==0))){
+    if (strcmp(path, "") != 0){
         bson_iter_find_descendant(&iter, full_path, &baz);
         bson_t *b_res;
 
@@ -206,14 +199,8 @@ char *api_read(char *path, char *param, char *value, char *key, char *cond) {
         bson_iter_init(&new_iter, &b);
     }
 
-    ////printf("%s\n",bson_as_canonical_extended_json(b_res, NULL));
-
-//    bson_iter_find_descendant(&iter, full_path, &baz);
     bson_t result = recurrent_read(new_iter, "", path, param, value, key, cond);
-    //write_bson(result);
-    ////printf("%s\n",bson_as_canonical_extended_json(&result,NULL));
     return bson_as_canonical_extended_json(&result, NULL);
-
 }
 
 
@@ -223,24 +210,17 @@ char *api_read_no_cond(char *path, char *param, char *value, char *key, char *co
 
     char full_path[full_path_len];
     strcpy(full_path, path);
-    if (!(strcmp(key, "") == 0)) {
+    if (strcmp(key, "") != 0) {
         strcat(full_path, ".");
         strcat(full_path, key);
     }
-    ////printf("fullpath=%s",full_path);
 
-
-
-    ////printf("%s\n", bson_as_canonical_extended_json(&b,NULL));
     bson_iter_t iter;
     bson_iter_t baz;
     if ((strcmp(full_path, "") == 0) || (strcmp(full_path, ".") == 0)) return bson_as_canonical_extended_json(&b, NULL);
 
     if (bson_iter_init(&iter, &b) && bson_iter_find_descendant(&iter, full_path, &baz)) {
         if (BSON_ITER_HOLDS_UTF8 (&baz)) {
-            //bson_iter_value (&baz)
-
-            ////printf("baz = %s", bson_iter_utf8(&baz,NULL));
             char buffer[BUFFER_SIZE];
             bzero(buffer, BUFFER_SIZE);
             strcpy(buffer, bson_iter_utf8(&baz, NULL));
@@ -398,13 +378,9 @@ bson_t recurrent_delete(bson_iter_t iter, char *path, char *path_eq, char *param
                 if (strcmp(full_path, path_eq) == 0) continue;
             } else{
                 if ((strcmp(cond, "=") == 0) && (strcmp(param, bson_iter_utf8(&iter,NULL)) == 0) && (index_of(full_path,path_eq)==0)) {
-                    //printf("delete=");
-                    //bson_append_utf8(&inner, bson_iter_key(&iter), -1, value, -1);
                     continue;
                 }
                 if ((strcmp(cond, "!=") == 0) && (strcmp(param, bson_iter_utf8(&iter,NULL)) != 0) && (index_of(full_path,path_eq)==0)) {
-                    //printf("delete!=");
-                    //bson_append_utf8(&inner, bson_iter_key(&iter), -1, value, -1);
                     continue;
                 }
             }

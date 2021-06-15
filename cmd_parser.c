@@ -47,3 +47,4 @@ const char *parse_cmd_to_json(char *cmd) {
 json_object* parse_str_to_json_obj(const char* in) {
     return json_tokener_parse(in);
 }
+

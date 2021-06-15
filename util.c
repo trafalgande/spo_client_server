@@ -22,11 +22,9 @@ char* substring(char *destination, const char *source, int beg, int n)
     return destination;
 }
 const int index_of(char * str, char* substr){
-    //char *str = "sdfadabcGGGGGGGGG";
     char *result = strstr(str, substr);
     if (result==NULL) return -1;
     int position = result - str;
-    //int substringLength = strlen(str) - position;
     return position;
 }
 
